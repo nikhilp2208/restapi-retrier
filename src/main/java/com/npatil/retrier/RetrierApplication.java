@@ -22,10 +22,12 @@ public class RetrierApplication extends Application<RetrierConfiguration> {
 
     @Override
     public void initialize(Bootstrap<RetrierConfiguration> bootstrap) {
+        RetrierBundle retrierBundle = new RetrierBundle();
+        bootstrap.addBundle(retrierBundle);
 
         bootstrap.addBundle(GuiceBundle.<RetrierConfiguration>newBuilder()
                 .enableAutoConfig(getClass().getPackage().getName())
-                .addModule(new RetrierModule())
+                .addModule(new RetrierModule(retrierBundle))
                 .setConfigClass(RetrierConfiguration.class)
                 .build(Stage.DEVELOPMENT));
     }

@@ -1,0 +1,53 @@
+name: restapi-retrier
+
+rabbitMqProducer:
+  username: guest
+  password: guest
+  virtualHost: /
+  host: localhost
+  port: 5672
+  requestedChannelMax: 0
+  requestedFrameMax: 0
+  requestedHeartbeat: 0
+  connectionTimeout: 0
+  handshakeTimeout: 10000
+  shutdownTimeout: 10000
+  networkRecoveryInterval: 5000
+
+server:
+  applicationConnectors:
+    - type: http
+      port: 8200
+  adminConnectors:
+    - type: http
+      port: 8201
+
+jerseyClient:
+  timeout: 50000ms
+  connectionTimeout: 50000ms
+  timeToLive: 1h
+  cookiesEnabled: false
+  maxConnections: 1024
+  maxConnectionsPerRoute: 1024
+  keepAlive: 0ms
+  retries: 0
+
+
+cache:
+  master: mymaster
+  sentinels: 127.0.0.1:26379
+  timeout: 100
+  db: 5
+  maxThreads: 8
+  password: "foobared"
+
+consumer:
+  pollerDelay: 1000
+  groupingEnabled: true
+
+logging:
+  level: INFO
+  loggers:
+    "com.npatil.retrier.resources": ALL
+  appenders:
+    - type: console
