@@ -24,42 +24,12 @@ public class RetrierProducer {
         this.channelPool = channelPool;
     }
 
-    public void send(String queue, String message, long delay) {
-        try{
-            Channel channel = channelPool.borrowObject();
-            Map<String, Object> headers = new HashMap<String, Object>();
-            headers.put("x-delay", delay);
-            AMQP.BasicProperties.Builder props = new AMQP.BasicProperties.Builder().headers(headers);
-            channel.basicPublish("retry-exchange", queue, props.build(), message.getBytes());
-            log.info(message + " sent");
-            channelPool.returnObject(channel);
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-    }
-
-    public void send(InternalQueue queue, String message, int retryCount, String queueName) {
-        try{
-            Channel channel = channelPool.borrowObject();
-            Map<String, Object> headers = new HashMap<String, Object>();
-            headers.put("x-delay", queue.getDelay());
-            headers.put("x-retry-count", retryCount);
-            headers.put("x-retry-queue", queueName);
-            AMQP.BasicProperties.Builder props = new AMQP.BasicProperties.Builder().headers(headers);
-            channel.basicPublish("retry-exchange", queue.getName(), props.build(), message.getBytes());
-            log.info(message + " sent");
-            channelPool.returnObject(channel);
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-    }
-
-    public void send(InternalQueue queue, String message) {
+    public void send(String retryWorkflowName, InternalQueue queue, String message) {
         try{
             Channel channel = channelPool.borrowObject();
             Map<String, Object> headers = new HashMap<String, Object>();
             AMQP.BasicProperties.Builder props = new AMQP.BasicProperties.Builder().contentType("text/plain").deliveryMode(PERSISTENCE_MESSAGE).headers(headers);
-            channel.basicPublish("retry-exchange", queue.getName(), props.build(), message.getBytes());
+            channel.basicPublish(retryWorkflowName, queue.getName(), props.build(), message.getBytes());
             log.info(message + " sent");
             channelPool.returnObject(channel);
         }catch (Exception e){

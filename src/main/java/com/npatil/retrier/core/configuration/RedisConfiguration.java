@@ -16,7 +16,7 @@ import javax.validation.constraints.Min;
 @Getter
 @Setter
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class CacheConfiguration {
+public class RedisConfiguration {
 
     @JsonProperty
     @NonNull

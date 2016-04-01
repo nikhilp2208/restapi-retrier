@@ -34,6 +34,5 @@ public class RetrierApplication extends Application<RetrierConfiguration> {
 
     @Override
     public void run(RetrierConfiguration configuration, Environment environment) throws Exception {
-
     }
 }

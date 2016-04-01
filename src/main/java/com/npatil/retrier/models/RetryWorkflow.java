@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.*;
-import org.hibernate.validator.constraints.NotEmpty;
 
 import java.util.List;
 
@@ -18,19 +17,17 @@ import java.util.List;
 @Setter
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonNaming(PropertyNamingStrategy.LowerCaseWithUnderscoresStrategy.class)
-public class Queue {
+@ToString
+public class RetryWorkflow {
     @JsonProperty
     @NonNull
     private String name;
 
     @JsonProperty
     @NonNull
-    @NotEmpty
-    private String type;
-
-    @JsonProperty
-    @NonNull
     private long[] retryDelays;
+
+    private Exchange exchange;
 
     private List<InternalQueue> internalQueues;
 }

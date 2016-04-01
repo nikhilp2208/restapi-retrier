@@ -6,7 +6,6 @@ import com.npatil.retrier.models.InternalQueue;
 import com.npatil.retrier.models.Message;
 import com.npatil.retrier.services.QueueService;
 import com.npatil.retrier.services.RetrierProducer;
-import com.oracle.tools.packager.Log;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.ws.rs.Consumes;
@@ -18,7 +17,7 @@ import javax.ws.rs.core.MediaType;
 import java.util.Objects;
 
 /**
- * Created by nikhil.p on 31/03/16.
+ * Created by nikhil.p on 11/03/16.
  */
 
 @Slf4j
@@ -36,16 +35,10 @@ public class RetryResource {
 
     @POST
     public void retry(Message message, @Context HttpHeaders httpHeaders) throws Exception {
-        String queueName = httpHeaders.getRequestHeaders().getFirst("x-retry-queue");
-        if (Objects.isNull(queueName)) queueName = "default";
+        String retryWorkflowName = httpHeaders.getRequestHeaders().getFirst("x-retry-queue");
+        if (Objects.isNull(retryWorkflowName)) retryWorkflowName = "default";
         InternalQueue internalQueue;
-        internalQueue = queueService.getPublishQueue(queueName);
-        producer.send(internalQueue, new ObjectMapper().writeValueAsString(message));
-    }
-
-    @POST
-    @Path("/test")
-    public void test(Object message) throws Exception {
-        Log.info(message.toString());
+        internalQueue = queueService.getPublishQueue(retryWorkflowName);
+        producer.send(retryWorkflowName, internalQueue, new ObjectMapper().writeValueAsString(message));
     }
 }

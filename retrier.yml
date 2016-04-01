@@ -1,6 +1,6 @@
 name: restapi-retrier
 
-rabbitMqProducer:
+rabbitMqConnection:
   username: guest
   password: guest
   virtualHost: /

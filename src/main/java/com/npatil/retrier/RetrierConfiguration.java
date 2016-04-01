@@ -1,9 +1,8 @@
 package com.npatil.retrier;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.npatil.retrier.core.configuration.CacheConfiguration;
 import com.npatil.retrier.core.configuration.ConsumerConfiguration;
-import com.npatil.retrier.models.Queue;
+import com.npatil.retrier.core.configuration.RedisConfiguration;
 import com.sun.istack.internal.NotNull;
 import io.codemonastery.dropwizard.rabbitmq.ConnectionFactory;
 import io.dropwizard.Configuration;
@@ -14,7 +13,6 @@ import lombok.Setter;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.Valid;
-import java.util.Map;
 
 /**
  * Created by nikhil.p on 31/03/16.
@@ -34,9 +32,6 @@ public class RetrierConfiguration extends Configuration {
 
     private int aggregatorPoolSize = 16;
 
-    @JsonProperty
-    private Map<String,Queue> queues;
-
     @Valid
     @javax.validation.constraints.NotNull
     @JsonProperty
@@ -45,7 +40,7 @@ public class RetrierConfiguration extends Configuration {
     @Valid
     @NonNull
     @JsonProperty
-    private CacheConfiguration cache;
+    private RedisConfiguration cache;
 
     @Valid
     @NonNull

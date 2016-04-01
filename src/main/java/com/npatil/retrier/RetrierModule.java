@@ -8,12 +8,13 @@ import com.google.inject.Scopes;
 import com.google.inject.Singleton;
 import com.npatil.retrier.callables.ConsumerPollerTask;
 import com.npatil.retrier.callables.ConsumerPollerTaskImpl;
-import com.npatil.retrier.core.configuration.CacheConfiguration;
 import com.npatil.retrier.core.configuration.ConsumerConfiguration;
+import com.npatil.retrier.core.configuration.RedisConfiguration;
 import com.npatil.retrier.core.managed.ConsumerManager;
-import com.npatil.retrier.core.managed.Redis;
-import com.npatil.retrier.core.redis.RedisManager;
+import com.npatil.retrier.core.redis.Redis;
 import com.npatil.retrier.factories.ChannelPoolFactory;
+import com.npatil.retrier.services.ExchangeService;
+import com.npatil.retrier.services.ExchangeServiceImpl;
 import com.npatil.retrier.services.QueueService;
 import com.npatil.retrier.services.QueueServiceImpl;
 import com.rabbitmq.client.Channel;
@@ -33,15 +34,14 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
  */
 @AllArgsConstructor
 public class RetrierModule extends AbstractModule {
-
     private RetrierBundle retrierBundle;
 
     @Override
     protected void configure() {
-        bind(RedisManager.class).in(Scopes.SINGLETON);
         bind(Redis.class).in(Scopes.SINGLETON);
         bind(ConsumerManager.class).in(Scopes.SINGLETON);
         bind(QueueService.class).to(QueueServiceImpl.class);
+        bind(ExchangeService.class).to(ExchangeServiceImpl.class);
         bind(ConsumerPollerTask.class).to(ConsumerPollerTaskImpl.class);
     }
 
@@ -55,7 +55,7 @@ public class RetrierModule extends AbstractModule {
     @Singleton
     public JedisSentinelPool provideJedisSentinelPool(RetrierConfiguration configuration) {
         JedisPoolConfig poolConfig = new JedisPoolConfig();
-        CacheConfiguration redisConfiguration = configuration.getCache();
+        RedisConfiguration redisConfiguration = configuration.getCache();
         poolConfig.setMaxTotal(redisConfiguration.getMaxThreads());
         return new JedisSentinelPool(redisConfiguration.getMaster(), Sets.newHashSet(redisConfiguration.getSentinels().split(",")), poolConfig, redisConfiguration.getTimeout(), redisConfiguration.getPassword(), redisConfiguration.getDb());
     }

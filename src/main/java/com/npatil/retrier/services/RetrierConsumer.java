@@ -2,8 +2,6 @@ package com.npatil.retrier.services;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.npatil.retrier.core.configuration.ConsumerConfiguration;
-import com.npatil.retrier.core.managed.WebClient;
-import com.npatil.retrier.core.redis.RedisManager;
 import com.npatil.retrier.models.Message;
 import com.npatil.retrier.models.RetryRequest;
 import com.rabbitmq.client.AMQP;
@@ -14,6 +12,10 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.util.Objects;
@@ -26,14 +28,12 @@ import java.util.Objects;
 @Setter
 public class RetrierConsumer extends DefaultConsumer{
 
-    WebClient webClient;
-    RedisManager redisManager;
+    Client client;
     ConsumerConfiguration consumerConfiguration;
 
-    public RetrierConsumer(Channel channel, WebClient webClient, RedisManager redisManager, ConsumerConfiguration consumerConfiguration) {
+    public RetrierConsumer(Channel channel, Client client, ConsumerConfiguration consumerConfiguration) {
         super(channel);
-        this.webClient = webClient;
-        this.redisManager = redisManager;
+        this.client = client;
         this.consumerConfiguration = consumerConfiguration;
     }
 
@@ -46,17 +46,6 @@ public class RetrierConsumer extends DefaultConsumer{
             ObjectMapper objectMapper = new ObjectMapper();
             Message message = objectMapper.readValue(messageString, Message.class);
 
-//            long retryCount = (long) properties.getHeaders().get("x-retry-count");
-//            String queueName = (String) properties.getHeaders().get("x-retry-queue");
-//            log.info("Consumed message from queue: "+ queueName);
-
-            // Will be triggered if the previous message with same groupId is in next retry queue
-//            if (consumerConfiguration.isGroupingEnabled() && moveToNextRetry(message.getGroupId(),message.getMessageId())) {
-//                reQueueMessage(queueName ,retryCount, message);
-//                getChannel().basicAck(envelope.getDeliveryTag(), false);
-//                return;
-//            }
-
             Response response = null;
             try {
                 response = deliverMessage(message.getRetryRequest());
@@ -64,43 +53,25 @@ public class RetrierConsumer extends DefaultConsumer{
                 e.printStackTrace();
             }
             if (Objects.nonNull(response) && response.getStatusInfo().getFamily().equals(Response.Status.Family.SUCCESSFUL)) {
+                log.info(envelope.getRoutingKey() + ": Delivered message with id: " + message.getMessageId());
                 getChannel().basicAck(envelope.getDeliveryTag(), false);
             } else {
                 getChannel().basicNack(envelope.getDeliveryTag(), false, false);
+                log.info(envelope.getRoutingKey() + ": Delivery failed for message with id: " + message.getMessageId());
             }
-//                redisManager.removeFromSet(message.getGroupId(),message.getMessageId());
-//                log.info("Delivered message:" + message.getMessageId());
-//            } else {
-//                long maxRetryCount = redisManager.getListSize(queueName);
-//                if (retryCount < maxRetryCount) {
-//                    reQueueMessage(queueName ,retryCount, message);
-//                } else {
-//                    deliverMessage(message.getRetryFailureRequest());
-//                    redisManager.removeFromSet(message.getGroupId(),message.getMessageId());
-//                }
-//            }
-
-//            log.info("Processed message from queue: "+ queueName);
         }
     }
 
-//    private boolean moveToNextRetry(String groupId, String messageId) {
-//        List<String> storedMessageId = redisManager.getFromSet(groupId);
-//        if (Objects.nonNull(storedMessageId) && !storedMessageId.contains(messageId)) {
-//            return true;
-//        }
-//        return false;
-//    }
-
     private Response deliverMessage(RetryRequest retryRequest) throws Exception{
         String requestType = retryRequest.getRequestType();
+        WebTarget webTarget = client.target(retryRequest.getUrl());
         switch (requestType.toUpperCase()) {
             case "POST" :
-                return webClient.buildPost(retryRequest.getUrl(),retryRequest.getHeaders(), retryRequest.getRequestBody());
+                return webTarget.request().headers(retryRequest.getHeaders()).post(Entity.entity(retryRequest.getRequestBody(), MediaType.APPLICATION_JSON_TYPE+ ";charset=UTF-8"));
             case "PUT" :
-                return webClient.buildPut(retryRequest.getUrl(),retryRequest.getHeaders(), retryRequest.getRequestBody());
+                return webTarget.request().headers(retryRequest.getHeaders()).post(Entity.entity(retryRequest.getRequestBody(), MediaType.APPLICATION_JSON_TYPE+ ";charset=UTF-8"));
             case "GET" :
-                return webClient.buildGet(retryRequest.getUrl(),retryRequest.getHeaders());
+                return webTarget.request().headers(retryRequest.getHeaders()).buildGet().invoke();
             default:
                 return null;
         }

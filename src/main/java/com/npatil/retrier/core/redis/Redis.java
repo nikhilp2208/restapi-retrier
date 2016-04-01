@@ -1,4 +1,4 @@
-package com.npatil.retrier.core.managed;
+package com.npatil.retrier.core.redis;
 
 import com.google.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
@@ -6,7 +6,6 @@ import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisSentinelPool;
 
 import javax.inject.Singleton;
-import java.util.Objects;
 
 /**
  * Created by nikhil.p on 31/03/16.
@@ -24,15 +23,5 @@ public class Redis {
 
     public Jedis getResource() {
         return jedisSentinelPool.getResource();
-    }
-
-    public void ping() throws Exception {
-        try (Jedis jedis = jedisSentinelPool.getResource()) {
-            jedis.ping();
-        }
-    }
-
-    public void destroy() {
-        if (!Objects.isNull(jedisSentinelPool)) jedisSentinelPool.destroy();
     }
 }

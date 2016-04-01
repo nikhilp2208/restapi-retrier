@@ -34,7 +34,4 @@ public class RetryRequest {
 
     @JsonProperty
     private MultivaluedHashMap<String,Object> headers;
-//
-//    @NonNull
-//    private String queue;
 }

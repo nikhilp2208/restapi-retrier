@@ -1,7 +1,7 @@
 package com.npatil.retrier.services;
 
 import com.npatil.retrier.models.InternalQueue;
-import com.npatil.retrier.models.Queue;
+import com.npatil.retrier.models.RetryWorkflow;
 
 import java.io.IOException;
 import java.util.List;
@@ -12,37 +12,30 @@ import java.util.List;
 public interface QueueService {
 
     /**
-     * @param queue
+     * @param retryWorkflow
      * @param internalQueue
      * @return
      */
-    boolean createInternalQueue(Queue queue, InternalQueue internalQueue);
+    boolean createInternalQueue(RetryWorkflow retryWorkflow, InternalQueue internalQueue);
 
     /**
-     * @param queue
-     * @param retryCount
-     * @return
-     */
-    InternalQueue getInternalQueue(Queue queue, int retryCount) throws IOException;
-
-    /**
-     * @param queueName
+     * @param retryWorkflowName
      * @return
      * @throws IOException
      */
-    InternalQueue getPublishQueue(String queueName) throws IOException;
+    InternalQueue getPublishQueue(String retryWorkflowName) throws IOException;
 
     /**
-     * @param queueName
+     * @param retryWorkflowName
      * @param retryCount
      * @return
      * @throws IOException
      */
-    InternalQueue getInternalQueue(String queueName, int retryCount) throws IOException;
+    InternalQueue getInternalQueue(String retryWorkflowName, int retryCount) throws IOException;
 
     /**
-     * @param queue
+     * @param retryWorkflow
      * @return
      */
-    List<InternalQueue> getInternalQueues(Queue queue);
+    List<InternalQueue> getInternalQueues(RetryWorkflow retryWorkflow);
 }
