@@ -3,7 +3,6 @@ package com.npatil.retrier;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.npatil.retrier.core.configuration.ConsumerConfiguration;
 import com.npatil.retrier.core.configuration.RedisConfiguration;
-import com.sun.istack.internal.NotNull;
 import io.codemonastery.dropwizard.rabbitmq.ConnectionFactory;
 import io.dropwizard.Configuration;
 import io.dropwizard.client.JerseyClientConfiguration;
@@ -13,6 +12,7 @@ import lombok.Setter;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 
 /**
  * Created by nikhil.p on 31/03/16.
