@@ -26,7 +26,7 @@ Content-Type: application/json
 ### Schedule a Retry Request
 
 ```
-POST http://localhost:8200/retry_workflow
+POST http://localhost:8200/retry
 
 HEADERS: 
 Content-Type: application/json
