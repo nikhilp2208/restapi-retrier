@@ -35,7 +35,7 @@ public class RetryResource {
 
     @POST
     public void retry(Message message, @Context HttpHeaders httpHeaders) throws Exception {
-        String retryWorkflowName = httpHeaders.getRequestHeaders().getFirst("x-retry-queue");
+        String retryWorkflowName = httpHeaders.getRequestHeaders().getFirst("x-retry-workflow");
         if (Objects.isNull(retryWorkflowName)) retryWorkflowName = "default";
         InternalQueue internalQueue;
         internalQueue = queueService.getPublishQueue(retryWorkflowName);

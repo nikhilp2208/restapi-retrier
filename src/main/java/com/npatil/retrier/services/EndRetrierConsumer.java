@@ -58,9 +58,13 @@ public class EndRetrierConsumer extends DefaultConsumer{
             } else {
                 try {
                     log.info(envelope.getRoutingKey() + ": Delivery failed for message with id: " + message.getMessageId());
-                    deliverMessage(message.getRetryFailureRequest());
-                    getChannel().basicAck(envelope.getDeliveryTag(), false);
-                    log.info(envelope.getRoutingKey() + ": Post retry action successful for message with id: " + message.getMessageId());
+                    if (Objects.nonNull(message.getRetryFailureRequest())) {
+                        deliverMessage(message.getRetryFailureRequest());
+                        getChannel().basicAck(envelope.getDeliveryTag(), false);
+                        log.info(envelope.getRoutingKey() + ": Post retry action successful for message with id: " + message.getMessageId());
+                    } else {
+                        log.info(envelope.getRoutingKey() + ": No Post retry action specified for message with id: " + message.getMessageId());
+                    }
                 } catch (Exception e) {
                     getChannel().basicNack(envelope.getDeliveryTag(), false, true);
                     log.info(envelope.getRoutingKey() + ": Post retry action failed for message with id: " + message.getMessageId());

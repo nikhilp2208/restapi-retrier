@@ -12,7 +12,7 @@ A simple Retrier Service to retry the rest calls with configurable intervals bet
 * Update the appropriate configs in retrier.yml
 * Start the RabbitMQ server, Redis server, Redis sentinels
 * Start the restapi-retrier server
-* Create `default` retry workflow using the [Create Retry workflow](### Create Retry workflow) API
+* Create `default` retry workflow using the [Create Retry workflow](#create-retry-workflow) API
 
 
 ## Example APIs
@@ -41,7 +41,7 @@ POST http://localhost:8200/retry
 
 HEADERS: 
 Content-Type: application/json
-x-retry-queue: test
+x-retry-workflow: test
 
 {
     "message_id" : "foo",
@@ -67,7 +67,7 @@ x-retry-queue: test
 }
 ```
 
-`x-retry-queue`: Name of the retry workflow to use for retrying. If this header is not passed, `default` workflow will be used by default. So ensure you create default workflow during inital setup.
+`x-retry-workflow`: Name of the retry workflow to use for retrying. If this header is not passed, `default` workflow will be used by default. So ensure you create default workflow during inital setup.
 
 `message_id`: unique id for a message.
 
