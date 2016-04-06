@@ -28,7 +28,6 @@ public class Message {
     private RetryRequest retryRequest;
 
     @JsonProperty
-    @NonNull
     private RetryRequest retryFailureRequest;
 
 }

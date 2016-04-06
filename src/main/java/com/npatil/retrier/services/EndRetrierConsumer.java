@@ -63,6 +63,7 @@ public class EndRetrierConsumer extends DefaultConsumer{
                         getChannel().basicAck(envelope.getDeliveryTag(), false);
                         log.info(envelope.getRoutingKey() + ": Post retry action successful for message with id: " + message.getMessageId());
                     } else {
+                        getChannel().basicNack(envelope.getDeliveryTag(), false, false);
                         log.info(envelope.getRoutingKey() + ": No Post retry action specified for message with id: " + message.getMessageId());
                     }
                 } catch (Exception e) {
