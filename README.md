@@ -106,3 +106,5 @@ If the retry queue is final queue in the workflow, in case non-2xx response on t
 
 
 Note: In both Delay queues and Retry queues `x-dead-letter-routing-key` will be set to name of the next retry queue/delay queue respectively, as "queue_name" is being used as the routing key to push to the queue.
+
+![retry_workflow](retry_workflow.png?raw=true)
