@@ -15,7 +15,7 @@ A simple Retrier Service to retry the rest calls with configurable intervals bet
 * Create `default` retry workflow using the [Create Retry workflow](#create-retry-workflow) API
 
 
-## Example APIs
+## APIs
 
 ### Create Retry workflow
 
@@ -85,3 +85,24 @@ Eg: If the first message in the group fails in the first retry and is moved to t
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`headers`: Request headers.
 
 `retry_failure_request`: The fallback request which has to be executed if the all the retries fail.
+
+
+## Implementation Details
+
+### Retry Workflow
+Retry workflow is a series of rabbitmq queues that the retry request flows through. 
+There are two types of queues in the retry workflow:
+* Delay Queue (*prefixed with DQ*)
+* Retry Queue (*prefixed with RQ*)
+
+### Delay Queue
+It is the queue where the delay will be introduced between subsequent retries. It uses `x-dead-letter-exchange` and `x-message-ttl` to delay the messages before pushing them to the next retry queue. For more information on this, check [this link](http://yuserinterface.com/dev/2013/01/08/how-to-schedule-delay-messages-with-rabbitmq-using-a-dead-letter-exchange/). There won't be any consumers for this queue. 
+
+### Retry Queue
+There will be consumers running for Retry Queues. Consumers will pick the message from this queue and make the http call with headers and body specified in the `retry_request`. If the response recieved is 2xx, then `ack` will be sent to the queue. Else `nack` will be sent to the queue and the message will be moved to the next *Delay queue* through `dead-letter-exchange`.
+<br>
+If the retry queue is final queue in the workflow, in case non-2xx response on the `retry_request`, the `retry_failure_request` will be executed. If `retry_failure_request` is not specified, the message will be ignored and `nack` will be sent. Since there won't be any `dead-letter-exchange` associated with the last queue in workflow, this message will be discarded.
+
+
+
+Note: In both Delay queues and Retry queues `x-dead-letter-routing-key` will be set to name of the next retry queue/delay queue respectively, as "queue_name" is being used as the routing key to push to the queue.
