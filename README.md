@@ -108,3 +108,11 @@ If the retry queue is final queue in the workflow, in case non-2xx response on t
 Note: In both Delay queues and Retry queues `x-dead-letter-routing-key` will be set to name of the next retry queue/delay queue respectively, as "queue_name" is being used as the routing key to push to the queue.
 
 ![retry_workflow](retry_workflow.png?raw=true)
+
+## Contributing
+
+1. Fork it
+2. Create your feature branch (`git checkout -b my-new-feature`)
+3. Commit your changes (`git commit -am 'Added some feature'`)
+4. Push to the branch (`git push origin my-new-feature`)
+5. Create new Pull Request
